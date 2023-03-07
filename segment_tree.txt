@@ -1,0 +1,40 @@
+class SGT{
+  vector<int> sgt;
+public:
+  SGT(int n){
+    sgt.resize(4*n+1);
+  }
+  void  build(int idx,int low,int high,int arr[]){
+    if(low==high){
+      sgt[idx]=arr[low];
+      return;
+    }
+    int m=(low+high)/2;
+    build(2*idx+1,low,m,arr);
+    build(2*idx+2,m+1,high,arr);
+    sgt[idx]=min(sgt[2*idx+1],sgt[2*idx+2]);
+  }
+  void update(int idx,int id,int val,int low,int high){
+    if(low==high){
+      sgt[idx]=val;
+      return;
+    }
+    int m=(low+high)/2;
+    if(id>m)
+    update(2*idx+2,id,val,m+1,high);
+    else
+    update(2*idx+1,id,val,low,m);
+    sgt[idx]=min(sgt[2*idx+1],sgt[2*idx+2]);
+  }
+  int find(int idx,int l,int r,int low,int high){
+    if(l<=low && high<=r)
+    return sgt[idx];
+    else if(r<low || high<l)
+    return INT_MAX;
+    else{
+      int m=(low+high)/2;
+      return min(find(2*idx+1,l,r,low,m),find(2*idx+2,l,r,m+1,high));
+    }
+  }
+
+};
