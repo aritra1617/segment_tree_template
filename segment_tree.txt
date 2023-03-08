@@ -1,40 +1,76 @@
 class SGT{
   vector<int> sgt;
+  vector<int> sgt_sum;
 public:
   SGT(int n){
     sgt.resize(4*n+1);
+    sgt_sum.resize(4*n);
   }
-  void  build(int idx,int low,int high,int arr[]){
+  void  build_min(int idx,int low,int high,int arr[]){
     if(low==high){
       sgt[idx]=arr[low];
       return;
     }
     int m=(low+high)/2;
-    build(2*idx+1,low,m,arr);
-    build(2*idx+2,m+1,high,arr);
+    build_min(2*idx+1,low,m,arr);
+    build_min(2*idx+2,m+1,high,arr);
     sgt[idx]=min(sgt[2*idx+1],sgt[2*idx+2]);
   }
-  void update(int idx,int id,int val,int low,int high){
+  void build_sum(int idx,int low,int high,int arr[]){
+       if(low==high){
+       sgt_sum[idx]=arr[low];
+       return;
+       }
+       int m=(low+high)/2;
+       build_sum(2*idx+1,low,m,arr);
+       build_sum(2*idx+2,m+1,high,arr);
+       sgt_sum[idx]=sgt_sum[2*idx+1]+sgt_sum[2*idx+2];
+  }
+  void update_min(int idx,int id,int val,int low,int high){
     if(low==high){
       sgt[idx]=val;
       return;
     }
     int m=(low+high)/2;
     if(id>m)
-    update(2*idx+2,id,val,m+1,high);
+    update_min(2*idx+2,id,val,m+1,high);
     else
-    update(2*idx+1,id,val,low,m);
+    update_min(2*idx+1,id,val,low,m);
     sgt[idx]=min(sgt[2*idx+1],sgt[2*idx+2]);
   }
-  int find(int idx,int l,int r,int low,int high){
+  void update_sum(int idx,int id,int val,int low,int high){
+    if(low==high)
+    {
+      sgt_sum[idx]=val;
+      return;
+    }
+    int m=(low+high)/2;
+    if(id<=m)
+    update_sum(2*idx+1,id,val,low,m);
+    else
+    update_sum(2*idx+2,id,val,m+1,high);
+    sgt_sum[idx]=sgt_sum[2*idx+1]+sgt_sum[2*idx+2];
+  }
+  int find_min(int idx,int l,int r,int low,int high){
     if(l<=low && high<=r)
     return sgt[idx];
     else if(r<low || high<l)
     return INT_MAX;
     else{
       int m=(low+high)/2;
-      return min(find(2*idx+1,l,r,low,m),find(2*idx+2,l,r,m+1,high));
+      return min(find_min(2*idx+1,l,r,low,m),find_min(2*idx+2,l,r,m+1,high));
     }
   }
 
+  int find_sum(int idx,int l,int r,int low,int high){
+    if(high<l || r<low)
+    return 0;
+    else if(l<=low && r>=high)
+    return sgt_sum[idx];
+    else
+    {
+      int m=(low+high)/2;
+      return find_sum(2*idx+1,l,r,low,m)+find_sum(2*idx+2,l,r,m+1,high);
+    }
+  }
 };
